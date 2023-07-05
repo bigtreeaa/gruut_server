@@ -1,24 +1,29 @@
 # public libray
+import base64
+import hashlib
+
+import ecdsa
 from Crypto.Hash import SHA256
 from bitarray.util import hex2ba
 from Crypto.PublicKey import ECC
 from Crypto.Signature import DSS
-import hashlib
+from ecdsa.util import sigdecode_der
+from hashlib import sha256
 # project file :)
 import der_decoder
 
 # sample data
+# pem formatted public key
 publicKey = """-----BEGIN PUBLIC KEY-----
-    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEqzkre/No20HVUUoBinG2SUmwdXMA
-    4kiXUbZtpKSa
-    B3UYCbZG2fVne/T4Sb81a1LwQ9HXBS/7YCJG8JRdR9T2Ew==
-    
+    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAaiIUwqSeTdOtome9+b5ZvgrTnko
+    SGdo5dcgm4+w
+    0YNjHm3lJWxOqO0R1ZuL1NJCnSaweYYI9VF5g67H/9Cj7g==
     -----END PUBLIC KEY-----"""
-hex_string_signature = "30460221008061585A59CBA8A722DCF03C004D38C26BDD369B6B09D68E94A25A7B31315F790221008286DFD7202192D167B406DC39A2879DFF204F32BEB1388843C184C077B5F8F0"
+pk = base64.b64decode("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEl4y7uNyREELwW56XiEGdGsQuFpbqKGPQYb71T/H/67vIeuTz9mz+U/WkKPnt8loPqUE2hA2ea3e7eXSS7Ub2ng==")
+hex_string_signature = "3044022058EFFBAB2BAA81BD35CA1D5C82E52770D9F0C66D85E2D776E4D2C582E8BBB6320220366A27E9FB17E81A5B4DDBF2BDB64A30155BB861D84E517FADC5D6C1EA54245A"
 
 
 if __name__ == "__main__":
-
     # import public key & generate verifier
     public_key = ECC.import_key(publicKey)
     verifier = DSS.new(public_key, 'fips-186-3')
@@ -30,5 +35,11 @@ if __name__ == "__main__":
     decoded_signature = der_decoder.der_decoder(hex_string_signature)
     ba_signature = hex2ba(decoded_signature)
     signature = bytes.fromhex(decoded_signature)
+    print(verifier.verify(hashed_message, signature))
 
-    print("result of verfier :", verifier.verify(hashed_message, signature))
+    # # new trial
+    # signature = bytes.fromhex(hex_string_signature)
+    # vk = ecdsa.VerifyingKey.from_string(pk, curve=ecdsa.NIST256p, hashfunc=sha256)
+    # assert vk.verify(signature, hashed_message, hashlib.sha256, sigdecode=sigdecode_der)
+
+
