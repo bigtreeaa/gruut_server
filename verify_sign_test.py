@@ -1,17 +1,20 @@
+# public libray
 from Crypto.Hash import SHA256
-from bitarray import bitarray
+from bitarray.util import hex2ba
 from Crypto.PublicKey import ECC
 from Crypto.Signature import DSS
-
+import hashlib
+# project file :)
 import der_decoder
 
 # sample data
 publicKey = """-----BEGIN PUBLIC KEY-----
-    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEURKMmJOOSEmdZLzzETir9ghU6yh1
-    6D3TITYPLCv2gRIkrtp9ym68VQJ3EndgcoOvppbuWpCG/gbnZkYqr3Jvlg==
+    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEqzkre/No20HVUUoBinG2SUmwdXMA
+    4kiXUbZtpKSa
+    B3UYCbZG2fVne/T4Sb81a1LwQ9HXBS/7YCJG8JRdR9T2Ew==
+    
     -----END PUBLIC KEY-----"""
-hex_string_signature = "304502200231B8DDBCA2CF4CB445A16CC073031FEA889B32B81E8D92D0A3E90C2C8EEE2D022100CA7CF34598E1D" \
-                       "BDA6B3D5BC83DB0DD4BF9F317535603CBF093B7EC8012C9DE7E"
+hex_string_signature = "30460221008061585A59CBA8A722DCF03C004D38C26BDD369B6B09D68E94A25A7B31315F790221008286DFD7202192D167B406DC39A2879DFF204F32BEB1388843C184C077B5F8F0"
 
 
 if __name__ == "__main__":
@@ -21,14 +24,11 @@ if __name__ == "__main__":
     verifier = DSS.new(public_key, 'fips-186-3')
 
     # 서명된 메시지
-    message = bytes("I give my permission to order #4355", 'utf-8')
+    message = bytes("random text", 'ascii')
     hashed_message = SHA256.new(message)
 
     decoded_signature = der_decoder.der_decoder(hex_string_signature)
+    ba_signature = hex2ba(decoded_signature)
     signature = bytes.fromhex(decoded_signature)
-    print(decoded_signature)
-    print(signature)
-    test = bitarray(endian='big')
-    test.frombytes(signature)
-    print(test)
-    verifier.verify(hashed_message, signature)
+
+    print("result of verfier :", verifier.verify(hashed_message, signature))
