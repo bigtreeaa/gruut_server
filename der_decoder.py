@@ -1,6 +1,3 @@
-from bitarray.util import hex2ba
-
-
 def der_decoder(signature):
     len_r = int(signature[6:8], 16)
     if len_r == 32:
